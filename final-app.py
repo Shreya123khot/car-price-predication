@@ -8,15 +8,12 @@ import streamlit as st
 import pickle as pkl
 import pandas as pd
 
-# Page settings
+# Hide the left sidebar
 st.set_page_config(
     page_title="Car Price Predictor",
-    page_icon="🚗",
-    layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# Hide the left sidebar completely
 st.markdown("""
 <style>
 [data-testid="stSidebar"] {
@@ -25,49 +22,40 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load model
-model = pkl.load(open("model.pkl", "rb"))
+st.title("Car Price Predictor")
 
-# Title
-st.title("🚗 Car Price Predictor")
-
-# Inputs
-company = st.text_input("Enter Company")
-name = st.text_input("Enter Car Name")
+company = st.text_input("Enter company")
+name = st.text_input("Enter car name")
 
 year = st.number_input(
-    "Enter Year",
+    "Enter year",
     min_value=2000,
     max_value=2024,
     step=1
 )
 
 kms_driven = st.number_input(
-    "Enter Kilometers Driven",
+    "Enter kilometers driven",
     min_value=10000,
     max_value=400000,
     step=5000
 )
 
 fuel_type = st.selectbox(
-    "Select Fuel Type",
+    "Select fuel type",
     ["Petrol", "Diesel", "LPG"]
 )
 
-# Predict
 if st.button("Predict Price"):
+    model = pkl.load(open("model.pkl", "rb"))
 
-    df = pd.DataFrame({
-        "company": [company],
-        "name": [name],
-        "year": [year],
-        "kms_driven": [kms_driven],
-        "fuel_type": [fuel_type]
-    })
+    data = [[company, name, year, kms_driven, fuel_type]]
+    columns = ["company", "name", "year", "kms_driven", "fuel_type"]
 
-    prediction = model.predict(df)
+    df = pd.DataFrame(data, columns=columns)
 
-    st.write("### Entered Details")
-    st.dataframe(df)
+    st.write(df)
 
-    st.success(f"Predicted Price: ₹{prediction[0]:,.0f}")
+    result = model.predict(df)
+
+    st.write("Predicted price:", round(result[0][0]))
