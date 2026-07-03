@@ -22,5 +22,5 @@ if st.button("Predict Price"):
     df = pd.DataFrame(data, columns=columns)
     st.write(df)
     result = model.predict(df)
-    st.write("Predicted price:", round(result[0,], 2))
+    st.write("Predicted price:", round(result[0][0]))
 
